@@ -60,7 +60,7 @@ namespace TicketingApp.Graph
                 Body = new ItemBody
                 {
                     ContentType = BodyType.Text,
-                    Content = "Il ticket è stato registrato ma al momento non sarà gestito."
+                    Content = "Il ticket è stato registrato, ma al momento non sarà gestito. Il giorno 31 rientra Omar e gestirà le vostre richieste."
                 },
                 ToRecipients = new List<Recipient>
                 {

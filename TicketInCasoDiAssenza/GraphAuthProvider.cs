@@ -27,7 +27,13 @@ namespace TicketingApp.Graph
             var clientSecret = Environment.GetEnvironmentVariable("GRAPH_CLIENT_SECRET");
             if (!string.IsNullOrEmpty(clientSecret))
             {
+                // Autenticazione applicativa
                 credential = new ClientSecretCredential(TENANT_ID, CLIENT_ID, clientSecret);
+                GraphClient = new GraphServiceClient(credential, new[] { "https://graph.microsoft.com/.default" });
+
+                // In modalità non interattiva non c'è un utente corrente.
+                // Permettiamo di specificarlo opzionalmente tramite variabile d'ambiente.
+                CurrentUserEmail = Environment.GetEnvironmentVariable("GRAPH_USER_EMAIL");
             }
             else
             {
@@ -37,13 +43,13 @@ namespace TicketingApp.Graph
                     TenantId = TENANT_ID,
                     ClientId = CLIENT_ID
                 });
+
+                GraphClient = new GraphServiceClient(credential, SCOPES);
+
+                // Recupera l'utente corrente
+                var me = await GraphClient.Me.GetAsync();
+                CurrentUserEmail = me.Mail ?? me.UserPrincipalName;
             }
-
-            GraphClient = new GraphServiceClient(credential, SCOPES);
-
-            // recupera l'utente per ottenere l'email e forzare il token
-            var me = await GraphClient.Me.GetAsync();
-            CurrentUserEmail = me.Mail ?? me.UserPrincipalName;
         }
     }
 }
