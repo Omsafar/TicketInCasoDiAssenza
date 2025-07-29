@@ -37,7 +37,7 @@ namespace TicketingApp.Graph
             }
             else
             {
-                // Fallback interattivo
+                // Fallback interattivos
                 credential = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions
                 {
                     TenantId = TENANT_ID,
