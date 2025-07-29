@@ -2,6 +2,8 @@
 using Azure.Identity;
 using Microsoft.Graph;
 using System.Threading.Tasks;
+using System;
+using Azure.Core;
 
 namespace TicketingApp.Graph
 {
@@ -18,13 +20,24 @@ namespace TicketingApp.Graph
 
         public static async Task InitializeAsync()
         {
-            // apre il browser di sistema per il login (SSO M365)
-            var credential = new InteractiveBrowserCredential(
-                new InteractiveBrowserCredentialOptions
+            TokenCredential credential;
+
+            // Per l'esecuzione non interattiva (es. Task Scheduler) permettiamo
+            // l'uso di una client secret tramite variabile d'ambiente
+            var clientSecret = Environment.GetEnvironmentVariable("GRAPH_CLIENT_SECRET");
+            if (!string.IsNullOrEmpty(clientSecret))
+            {
+                credential = new ClientSecretCredential(TENANT_ID, CLIENT_ID, clientSecret);
+            }
+            else
+            {
+                // Fallback interattivo
+                credential = new InteractiveBrowserCredential(new InteractiveBrowserCredentialOptions
                 {
                     TenantId = TENANT_ID,
                     ClientId = CLIENT_ID
                 });
+            }
 
             GraphClient = new GraphServiceClient(credential, SCOPES);
 

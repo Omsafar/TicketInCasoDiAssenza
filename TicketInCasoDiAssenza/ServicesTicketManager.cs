@@ -107,12 +107,14 @@ namespace TicketingApp.Services
                 };
 
                 await _repo.CreateAsync(ticket);
-                await _mailSender.SendTicketCreatedNotificationAsync(
+                await _mailSender.SendTicketNotManagedNotificationAsync(
                     "support.ticket@paratorispa.it",
                     ticket.MittenteEmail,
-                    ticket.TicketId,
-                    ticket.Oggetto,
-                    ticket.Corpo);
+                    ticket.TicketId);
+                await _mailSender.SendAdminNewTicketAlertAsync(
+                    "support.ticket@paratorispa.it",
+                    "omar.tagliabue@paratorispa.it",
+                    ticket.TicketId);
             }
             _lastSync = DateTimeOffset.UtcNow;
 
@@ -135,12 +137,14 @@ namespace TicketingApp.Services
             };
 
             await _repo.CreateAsync(ticket);
-            await _mailSender.SendTicketCreatedNotificationAsync(
+            await _mailSender.SendTicketNotManagedNotificationAsync(
                 "support.ticket@paratorispa.it",
                 ticket.MittenteEmail,
-                ticket.TicketId,
-                ticket.Oggetto,
-                ticket.Corpo);
+                ticket.TicketId);
+            await _mailSender.SendAdminNewTicketAlertAsync(
+                "support.ticket@paratorispa.it",
+                "omar.tagliabue@paratorispa.it",
+                ticket.TicketId);
 
             NotifyTicketsChanged();
             return ticket;

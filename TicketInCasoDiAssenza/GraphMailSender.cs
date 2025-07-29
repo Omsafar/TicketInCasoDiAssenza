@@ -1,6 +1,7 @@
 ﻿using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace TicketingApp.Graph
@@ -45,6 +46,68 @@ namespace TicketingApp.Graph
             await _graph
                 .Users[fromSharedMailbox]
                  .SendMail
+                .PostAsync(requestBody);
+        }
+
+        public async Task SendTicketNotManagedNotificationAsync(
+            string fromSharedMailbox,
+            string toAddress,
+            int ticketId)
+        {
+            var mail = new Message
+            {
+                Subject = $"TICKET NUMERO {ticketId:D4}",
+                Body = new ItemBody
+                {
+                    ContentType = BodyType.Text,
+                    Content = "Il ticket è stato registrato ma al momento non sarà gestito."
+                },
+                ToRecipients = new List<Recipient>
+                {
+                    new Recipient { EmailAddress = new EmailAddress { Address = toAddress } }
+                }
+            };
+
+            var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
+            {
+                Message = mail,
+                SaveToSentItems = true
+            };
+
+            await _graph
+                .Users[fromSharedMailbox]
+                .SendMail
+                .PostAsync(requestBody);
+        }
+
+        public async Task SendAdminNewTicketAlertAsync(
+            string fromSharedMailbox,
+            string adminEmail,
+            int ticketId)
+        {
+            var mail = new Message
+            {
+                Subject = $"Aperto ticket numero {ticketId:D4}",
+                Body = new ItemBody
+                {
+                    ContentType = BodyType.Text,
+                    Content = $"È stato aperto il ticket numero {ticketId:D4}. Controlla la casella support.ticket@paratorispa.it."
+                },
+                ToRecipients = new List<Recipient>
+                {
+                    new Recipient { EmailAddress = new EmailAddress { Address = adminEmail } }
+                }
+            };
+
+            var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
+            {
+                Message = mail,
+                SaveToSentItems = true
+            };
+
+            await _graph
+                .Users[fromSharedMailbox]
+                .SendMail
                 .PostAsync(requestBody);
         }
         public async Task SendTicketReopenedNotificationAsync(
